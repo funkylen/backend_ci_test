@@ -59,8 +59,7 @@ var app = new Vue({
                 }).then(function (response) {
                     if (response.data && response.data.status === 'error') {
                         self.authError = true
-                    }
-                    else if (response.data && response.data.status === 'success') {
+                    } else if (response.data && response.data.status === 'success') {
                         window.location.replace('/')
                     }
                 })
@@ -74,49 +73,55 @@ var app = new Vue({
                 self.invalidSum = false
                 axios.post('/main_page/add_money', {
                     sum: self.addSum,
+                }).then(function (response) {
+                    setTimeout(function () {
+                        $('#addModal').modal('hide');
+                    }, 500);
                 })
-                    .then(function (response) {
-                        setTimeout(function () {
-                            $('#addModal').modal('hide');
-                        }, 500);
-                    })
             }
         },
         openPost: function (id) {
             var self = this;
-            axios
-                .get('/main_page/get_post/' + id)
-                .then(function (response) {
-                    self.post = response.data.post;
-                    if (self.post) {
-                        setTimeout(function () {
-                            $('#postModal').modal('show');
-                        }, 500);
-                    }
-                })
+            axios.get('/main_page/get_post/' + id).then(function (response) {
+                self.post = response.data.post;
+                if (self.post) {
+                    setTimeout(function () {
+                        $('#postModal').modal('show');
+                    }, 500);
+                }
+            })
         },
         addLike: function (id) {
             var self = this;
-            axios
-                .get('/main_page/like')
-                .then(function (response) {
-                    self.likes = response.data.likes;
-                })
-
+            axios.get('/main_page/like').then(function (response) {
+                self.likes = response.data.likes;
+            })
         },
         buyPack: function (id) {
             var self = this;
             axios.post('/main_page/buy_boosterpack', {
                 id: id,
+            }).then(function (response) {
+                self.amount = response.data.amount
+                if (self.amount !== 0) {
+                    setTimeout(function () {
+                        $('#amountModal').modal('show');
+                    }, 500);
+                }
             })
-                .then(function (response) {
-                    self.amount = response.data.amount
-                    if (self.amount !== 0) {
-                        setTimeout(function () {
-                            $('#amountModal').modal('show');
-                        }, 500);
-                    }
-                })
+        },
+        comment: function (id) {
+            var self = this;
+
+            axios.post('/main_page/comment', {
+                post_id: id,
+                message: self.commentText
+            }).then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.post = response.data.post;
+                    self.commentText = '';
+                }
+            })
         }
     }
 });
