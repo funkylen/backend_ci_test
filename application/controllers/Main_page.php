@@ -59,12 +59,12 @@ class Main_page extends MY_Controller
 
     public function comment()
     {
-        $post_id = trim($this->post('post_id'));
-        $message = trim($this->post('message'));
-
         if (!User_model::is_logged()) {
             return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
         }
+
+        $post_id = trim($this->post('post_id'));
+        $message = trim($this->post('message'));
 
         if (empty($post_id) || empty($message)) {
             return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
@@ -123,8 +123,27 @@ class Main_page extends MY_Controller
 
     public function add_money()
     {
-        // todo: add money to user logic
-        return $this->response_success(['amount' => rand(1, 55)]);
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $sum = trim($this->post('sum'));
+
+        if (empty($sum)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        $user = User_model::get_user();
+
+        $balance = $user->get_wallet_balance() + floatval($sum);
+        $total_refilled = $user->get_wallet_total_refilled() + floatval($sum);
+
+        $user->set_wallet_balance($balance);
+        $user->set_wallet_total_refilled($total_refilled);
+
+        $user->reload(TRUE);
+
+        return $this->response_success(['amount' => $balance]);
     }
 
     public function buy_boosterpack()

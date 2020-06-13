@@ -67,17 +67,19 @@ var app = new Vue({
         },
         fiilIn: function () {
             var self = this;
-            if (self.addSum === 0) {
-                self.invalidSum = true
-            } else {
-                self.invalidSum = false
+
+            self.invalidSum = self.addSum === 0;
+
+            if (!self.invalidSum) {
+                self.invalidSum = false;
+
                 axios.post('/main_page/add_money', {
                     sum: self.addSum,
                 }).then(function (response) {
                     setTimeout(function () {
                         $('#addModal').modal('hide');
                     }, 500);
-                })
+                });
             }
         },
         openPost: function (id) {
