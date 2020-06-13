@@ -13,6 +13,15 @@ class MY_Controller extends CI_Controller
         parent::__construct();
     }
 
+    public function post($index = NULL)
+    {
+        $stream_clean = App::get_ci()->security->xss_clean(App::get_ci()->input->raw_input_stream);
+
+        $post = json_decode($stream_clean, TRUE);
+
+        return $index === NULL ? $post : $post[$index];
+    }
+
     public function __destruct()
     {
 
