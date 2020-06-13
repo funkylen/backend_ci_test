@@ -98,6 +98,8 @@ switch (ENVIRONMENT)
         exit(1); // EXIT_ERROR
 }
 
+session_start();
+
 /*
  *---------------------------------------------------------------
  * SYSTEM FOLDER NAME

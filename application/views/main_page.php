@@ -27,7 +27,7 @@
               </a>
             <? } else {?>
               <button type="button" class="btn btn-success my-2 my-sm-0" type="submit" data-toggle="modal"
-                      data-target="#loginModal">Log IN
+                      data-target="#loginModal">Вход
               </button>
             <? } ?>
         </li>

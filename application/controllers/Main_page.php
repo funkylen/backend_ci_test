@@ -112,7 +112,7 @@ class Main_page extends MY_Controller
     public function logout()
     {
         Login_model::logout();
-        redirect(site_url('/'));
+        redirect(site_url('/', 'http'));
     }
 
     public function add_money()
