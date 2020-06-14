@@ -128,15 +128,23 @@ class Post_model extends CI_Emerald_Model
     // generated
 
     /**
-     * @return mixed
+     * @return Post_likes_model[]
+     * @throws Exception
      */
     public function get_likes()
     {
+        $this->is_loaded(TRUE);
+
+        if (empty($this->likes)) {
+            $this->likes = Post_likes_model::get_all_by_post_id($this->get_id());
+        }
+
         return $this->likes;
     }
 
     /**
      * @return Comment_model[]
+     * @throws Exception
      */
     public function get_comments()
     {
@@ -152,6 +160,7 @@ class Post_model extends CI_Emerald_Model
 
     /**
      * @return User_model
+     * @throws Exception
      */
     public function get_user():User_model
     {
@@ -174,6 +183,7 @@ class Post_model extends CI_Emerald_Model
         parent::__construct();
 
         App::get_ci()->load->model('Comment_model');
+        App::get_ci()->load->model('Post_likes_model');
 
         $this->set_id($id);
     }
@@ -265,6 +275,7 @@ class Post_model extends CI_Emerald_Model
     /**
      * @param Post_model $data
      * @return stdClass
+     * @throws Exception
      */
     private static function _preparation_full_info(Post_model $data)
     {
@@ -278,9 +289,8 @@ class Post_model extends CI_Emerald_Model
 //            var_dump($d->get_user()->object_beautify()); die();
 
         $o->user = User_model::preparation($data->get_user(),'main_page');
-        $o->coments = Comment_model::preparation($data->get_comments(),'full_info');
-
-        $o->likes = rand(0, 25);
+        $o->comments = Comment_model::preparation($data->get_comments(),'full_info');
+        $o->likes = Post_likes_model::preparation($data->get_likes(), 'full_amount');
 
 
         $o->time_created = $data->get_time_created();
