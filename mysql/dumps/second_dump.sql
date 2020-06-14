@@ -28,6 +28,15 @@ CREATE TABLE `comment_likes` (
   FOREIGN KEY (`user_id`) REFERENCES user(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` binary NOT NULL,
+  `message` text NOT NULL,
+  `time_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `time_updated` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE `user`
   ADD `likes_balance` decimal(10,2) NOT NULL DEFAULT '0.00';
 
