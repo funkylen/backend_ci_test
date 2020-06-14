@@ -10,11 +10,16 @@ class Comment_model extends CI_Emerald_Model
 {
     const CLASS_TABLE = 'comment';
 
+    const TYPE_POST = 0;
+    const TYPE_COMMENT = 1;
+
 
     /** @var int */
     protected $user_id;
     /** @var int */
-    protected $assing_id;
+    protected $assign_id;
+    /** @var int */
+    protected $type;
     /** @var string */
     protected $text;
 
@@ -51,20 +56,20 @@ class Comment_model extends CI_Emerald_Model
     /**
      * @return int
      */
-    public function get_assing_id(): int
+    public function get_assign_id(): int
     {
-        return $this->assing_id;
+        return $this->assign_id;
     }
 
     /**
-     * @param int $assing_id
+     * @param int $assign_id
      *
      * @return bool
      */
-    public function set_assing_id(int $assing_id)
+    public function set_assign_id(int $assign_id)
     {
-        $this->assing_id = $assing_id;
-        return $this->save('assing_id', $assing_id);
+        $this->assign_id = $assign_id;
+        return $this->save('assign_id', $assign_id);
     }
 
 
@@ -127,6 +132,7 @@ class Comment_model extends CI_Emerald_Model
     }
 
     // generated
+
     /**
      * @return Comment_likes_model[]
      * @throws Exception
@@ -143,24 +149,29 @@ class Comment_model extends CI_Emerald_Model
     }
 
     /**
-     * @return mixed
+     * @return Comment_model[]
+     * @throws Exception
      */
     public function get_comments()
     {
+        $this->is_loaded(TRUE);
+
+        if (empty($this->comments)) {
+            $this->comments = Comment_model::get_all_by_assign_id($this->get_id(), Comment_model::TYPE_COMMENT);
+        }
+
         return $this->comments;
     }
 
     /**
      * @return User_model
      */
-    public function get_user():User_model
+    public function get_user(): User_model
     {
-        if (empty($this->user))
-        {
+        if (empty($this->user)) {
             try {
                 $this->user = new User_model($this->get_user_id());
-            } catch (Exception $exception)
-            {
+            } catch (Exception $exception) {
                 $this->user = new User_model();
             }
         }
@@ -199,17 +210,21 @@ class Comment_model extends CI_Emerald_Model
     }
 
     /**
-     * @param int $assting_id
+     * @param int $assign_id
+     * @param int $type
      * @return self[]
-     * @throws Exception
      */
-    public static function get_all_by_assign_id(int $assting_id)
+    public static function get_all_by_assign_id(int $assign_id, int $type)
     {
+        $data = App::get_ci()->s
+            ->from(self::CLASS_TABLE)
+            ->where('assign_id', $assign_id)
+            ->where('type', $type)
+            ->orderBy('time_created', 'ASC')
+            ->many();
 
-        $data = App::get_ci()->s->from(self::CLASS_TABLE)->where(['assign_id' => $assting_id])->orderBy('time_created','ASC')->many();
         $ret = [];
-        foreach ($data as $i)
-        {
+        foreach ($data as $i) {
             $ret[] = (new self())->set($i);
         }
         return $ret;
@@ -223,10 +238,11 @@ class Comment_model extends CI_Emerald_Model
      */
     public static function preparation($data, $preparation = 'default')
     {
-        switch ($preparation)
-        {
+        switch ($preparation) {
             case 'full_info':
                 return self::_preparation_full_info($data);
+            case 'with_comments':
+                return self::_preparation_with_comments($data);
             default:
                 throw new Exception('undefined preparation type');
         }
@@ -242,7 +258,7 @@ class Comment_model extends CI_Emerald_Model
     {
         $ret = [];
 
-        foreach ($data as $d){
+        foreach ($data as $d) {
             $o = new stdClass();
 
             $o->id = $d->get_id();
@@ -274,5 +290,23 @@ class Comment_model extends CI_Emerald_Model
         return $ret;
     }
 
+    /**
+     * @param self $data
+     * @return stdClass
+     * @throws Exception
+     */
+    private static function _preparation_with_comments($data)
+    {
+        $o = new stdClass();
 
+        $o->id = $data->get_id();
+        $o->text = $data->get_text();
+
+        $o->comments = Comment_model::preparation($data->get_comments(), 'full_info');
+
+        $o->time_created = $data->get_time_created();
+        $o->time_updated = $data->get_time_updated();
+
+        return $o;
+    }
 }

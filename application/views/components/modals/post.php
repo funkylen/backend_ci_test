@@ -42,13 +42,13 @@
                             </div>
                         </div>
 
-                        <? App::get_ci()->load->view('components/comments')?>
+                        <? App::get_ci()->load->view('components/post_comments')?>
 
                         <form class="form-inline">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="addComment" v-model="commentText">
+                                <input type="text" class="form-control" id="addComment" v-model="postCommentText">
                             </div>
-                            <button type="submit" class="btn btn-primary" @click.prevent="comment(post.id)">
+                            <button type="submit" class="btn btn-primary" @click.prevent="commentUnderPost(post.id)">
                                 Оставить комментарий
                             </button>
                         </form>
@@ -61,3 +61,5 @@
         </div>
     </div>
 </div>
+
+<? App::get_ci()->load->view('components/modals/comment')?>

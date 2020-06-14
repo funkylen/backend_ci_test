@@ -57,8 +57,28 @@ class Main_page extends MY_Controller
         return $this->response_success(['post' => $posts]);
     }
 
+    public function get_comment($comment_id)
+    {
+        $comment_id = intval($comment_id);
 
-    public function comment()
+        if (empty($comment_id)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        try {
+            $comment = new Comment_model($comment_id);
+        } catch (EmeraldModelNoDataException $ex) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NO_DATA);
+        }
+
+
+        $comment = Comment_model::preparation($comment, 'with_comments');
+
+        return $this->response_success(['comment' => $comment]);
+    }
+
+
+    public function comment_post()
     {
         if (!User_model::is_logged()) {
             return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
@@ -81,11 +101,43 @@ class Main_page extends MY_Controller
             'user_id' => User_model::get_user()->get_id(),
             'assign_id' => $post_id,
             'text' => $message,
+            'type' => Comment_model::TYPE_POST,
         ]);
 
         $posts = Post_model::preparation($post, 'full_info');
 
         return $this->response_success(['post' => $posts]);
+    }
+
+    public function comment_comment()
+    {
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $comment_id = trim($this->post('comment_id'));
+        $message = trim($this->post('message'));
+
+        if (empty($comment_id) || empty($message)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        try {
+            $comment = new Comment_model($comment_id);
+        } catch (EmeraldModelNoDataException $ex) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NO_DATA);
+        }
+
+        Comment_model::create([
+            'user_id' => User_model::get_user()->get_id(),
+            'assign_id' => $comment_id,
+            'text' => $message,
+            'type' => Comment_model::TYPE_COMMENT,
+        ]);
+
+        $comment = Comment_model::preparation($comment, 'with_comments');
+
+        return $this->response_success(['comment' => $comment]);
     }
 
 

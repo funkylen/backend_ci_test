@@ -5,6 +5,7 @@ var app = new Vue({
         login: '',
         pass: '',
         post: false,
+        comment: false,
         invalidLogin: false,
         invalidPass: false,
         invalidSum: false,
@@ -12,7 +13,8 @@ var app = new Vue({
         addSum: 0,
         amount: 0,
         likes: 0,
-        commentText: '',
+        postCommentText: '',
+        commentCommentText: '',
         packs: [
             {
                 id: 1,
@@ -94,6 +96,17 @@ var app = new Vue({
                 }
             });
         },
+        openComment: function (id) {
+            var self = this;
+            axios.get('/main_page/get_comment/' + id).then(function (response) {
+                self.comment = response.data.comment;
+                if (self.comment) {
+                    setTimeout(function () {
+                        $('#commentModal').modal('show');
+                    }, 500);
+                }
+            });
+        },
         addLike: function (id) {
             var self = this;
 
@@ -125,20 +138,33 @@ var app = new Vue({
                 }
             });
         },
-        comment: function (id) {
+        commentUnderPost: function (id) {
             var self = this;
 
-            axios.post('/main_page/comment', {
+            axios.post('/main_page/comment_post', {
                 post_id: id,
-                message: self.commentText
+                message: self.postCommentText
             }).then(function (response) {
                 if (response.data && response.data.status === 'success') {
                     self.post = response.data.post;
-                    self.commentText = '';
+                    self.postCommentText = '';
                 }
             });
         },
-        addLikeToComment: function (id) {
+        commentUnderComment: function (id) {
+            var self = this;
+
+            axios.post('/main_page/comment_comment', {
+                comment_id: id,
+                message: self.commentCommentText
+            }).then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.comment = response.data.comment;
+                    self.commentCommentText = '';
+                }
+            });
+        },
+        addLikeToPostComment: function (id) {
             var self = this;
 
             axios.post('/main_page/like_comment', {
@@ -155,7 +181,25 @@ var app = new Vue({
                     });
                 }
             });
-        }
+        },
+        addLikeToCommentComment: function (id) {
+            var self = this;
+
+            axios.post('/main_page/like_comment', {
+                comment_id: id,
+            }).then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.comment.comments = self.comment.comments.map(function (comment) {
+                        if (comment.id === id) {
+                            comment.likes = response.data.likes;
+                            comment.liked = true;
+                        }
+
+                        return comment;
+                    });
+                }
+            });
+        },
     }
 });
 
