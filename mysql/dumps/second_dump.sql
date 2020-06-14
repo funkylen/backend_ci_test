@@ -16,5 +16,17 @@ CREATE TABLE `post_likes` (
   FOREIGN KEY (`user_id`) REFERENCES user(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `comment_likes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `amount` int(11) UNSIGNED NOT NULL,
+  `time_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `time_updated` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`comment_id`) REFERENCES comment(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES user(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 COMMIT;
