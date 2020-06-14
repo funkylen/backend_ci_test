@@ -34,8 +34,14 @@ class Main_page extends MY_Controller
 
     public function get_all_posts()
     {
-        $posts = Post_model::preparation(Post_model::get_all(), 'main_page');
-        return $this->response_success(['posts' => $posts]);
+        $data['posts'] = Post_model::preparation(Post_model::get_all(), 'main_page');
+        if (User_model::is_logged()) {
+            $data['user'] = [
+                'wallet_balance' => User_model::get_user()->get_wallet_balance(),
+                'likes_balance' => User_model::get_user()->get_likes_balance(),
+            ];
+        }
+        return $this->response_success($data);
     }
 
     public function get_post($post_id)

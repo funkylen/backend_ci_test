@@ -20,6 +20,19 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <li class="nav-item text-white">
+                    Баланс: {{walletBalance}}$
+                </li>
+                <li class="nav-item text-white">
+                    Лайки: {{likesBalance}}
+                </li>
+                <li class="nav-item">
+                    <? if (User_model::is_logged()) { ?>
+                        <button type="button" class="btn btn-success my-2 my-sm-0" type="submit" data-toggle="modal"
+                                data-target="#addModal">Пополнить баланс
+                        </button>
+                    <? } ?>
+                </li>
                 <li class="nav-item">
                     <? if (User_model::is_logged()) { ?>
                         <a href="/main_page/logout" class="btn btn-primary my-2 my-sm-0"
@@ -28,13 +41,6 @@
                     <? } else { ?>
                         <button type="button" class="btn btn-success my-2 my-sm-0" type="submit" data-toggle="modal"
                                 data-target="#loginModal">Вход
-                        </button>
-                    <? } ?>
-                </li>
-                <li class="nav-item">
-                    <? if (User_model::is_logged()) { ?>
-                        <button type="button" class="btn btn-success my-2 my-sm-0" type="submit" data-toggle="modal"
-                                data-target="#addModal">Пополнить баланс
                         </button>
                     <? } ?>
                 </li>

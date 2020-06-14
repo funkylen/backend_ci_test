@@ -15,6 +15,8 @@ var app = new Vue({
         likes: 0,
         postCommentText: '',
         commentCommentText: '',
+        walletBalance: 0,
+        likesBalance: 0,
         packs: [
             {
                 id: 1,
@@ -42,6 +44,10 @@ var app = new Vue({
             .get('/main_page/get_all_posts')
             .then(function (response) {
                 self.posts = response.data.posts;
+                if (response.data.user) {
+                    self.walletBalance = response.data.user.wallet_balance;
+                    self.likesBalance = response.data.user.likes_balance;
+                }
             })
     },
     methods: {
@@ -78,6 +84,10 @@ var app = new Vue({
                 axios.post('/main_page/add_money', {
                     sum: self.addSum,
                 }).then(function (response) {
+                    if (response.data && response.data.status === 'success') {
+                        self.walletBalance = response.data.amount;
+                    }
+
                     setTimeout(function () {
                         $('#addModal').modal('hide');
                     }, 500);
@@ -114,17 +124,31 @@ var app = new Vue({
                 assign_id: id,
             }).then(function (response) {
                 if (response.data && response.data.status === 'success') {
+                    self.likesBalance -= 1;
                     self.likes = response.data.likes;
                 }
             });
         },
         buyPack: function (id) {
             var self = this;
+
+            var packPrice = function (packId) {
+                for (var i in self.packs) {
+                    if (self.packs[i].id === parseInt(packId, 10))
+                        return self.packs[i].price;
+                }
+
+                return 0;
+            };
+
             axios.post('/main_page/buy_boosterpack', {
                 id: id,
             }).then(function (response) {
                 if (response.data && response.data.status === 'success') {
                     self.amount = response.data.amount;
+                    self.likesBalance += response.data.amount;
+                    self.walletBalance -= packPrice(id);
+
                     if (self.amount !== 0) {
                         setTimeout(function () {
                             $('#amountModalSuccess').modal('show');
