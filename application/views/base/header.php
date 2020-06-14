@@ -20,19 +20,29 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-                <li class="nav-item text-white">
-                    Баланс: {{walletBalance}}$
-                </li>
-                <li class="nav-item text-white">
-                    Лайки: {{likesBalance}}
-                </li>
-                <li class="nav-item">
-                    <? if (User_model::is_logged()) { ?>
+                <? if (User_model::is_logged()) { ?>
+                    <li class="nav-item text-white">
+                        Баланс: {{walletBalance}}$
+                    </li>
+                    <li class="nav-item text-white">
+                        Лайки: {{likesBalance}}
+                    </li>
+                    <li class="nav-item text-white">
+                        <button type="button" class="btn btn-warning my-2 my-sm-0" type="submit" data-toggle="modal"
+                                data-target="#balanceHistoryModal" @click="loadBalanceHistory">История баланса
+                        </button>
+                    </li>
+                    <li class="nav-item text-white">
+                        <button type="button" class="btn btn-secondary my-2 my-sm-0" type="submit" data-toggle="modal"
+                                data-target="#packsHistoryModal">История бустерпаков
+                        </button>
+                    </li>
+                    <li class="nav-item">
                         <button type="button" class="btn btn-success my-2 my-sm-0" type="submit" data-toggle="modal"
                                 data-target="#addModal">Пополнить баланс
                         </button>
-                    <? } ?>
-                </li>
+                    </li>
+                <? } ?>
                 <li class="nav-item">
                     <? if (User_model::is_logged()) { ?>
                         <a href="/main_page/logout" class="btn btn-primary my-2 my-sm-0"

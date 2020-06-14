@@ -17,6 +17,7 @@ var app = new Vue({
         commentCommentText: '',
         walletBalance: 0,
         likesBalance: 0,
+        history: [],
         packs: [
             {
                 id: 1,
@@ -224,6 +225,24 @@ var app = new Vue({
                 }
             });
         },
+        loadBalanceHistory: function () {
+            var self = this;
+
+            axios.get('/main_page/get_balance_history').then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.history = response.data.history.map(function (item) {
+                        if (item.type === 0) {
+                            item.type = "Пополнение"
+                        }
+                        else if (item.type === 1) {
+                            item.type = "Покупка бустерпака"
+                        }
+
+                        return item;
+                    });
+                }
+            });
+        }
     }
 });
 

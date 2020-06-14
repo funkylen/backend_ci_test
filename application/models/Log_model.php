@@ -41,9 +41,9 @@ class Log_model extends CI_Emerald_Model
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function get_message(): int
+    public function get_message()
     {
         if (is_string($this->message)) {
             $this->message = json_decode($this->message, TRUE);
@@ -141,6 +141,25 @@ class Log_model extends CI_Emerald_Model
     }
 
     /**
+     * @param int $type
+     * @return self[]
+     * @throws Exception
+     */
+    public static function get_all_by_type(int $type)
+    {
+        $data = App::get_ci()->s
+            ->from(self::CLASS_TABLE)
+            ->where('type', $type)
+            ->many();
+
+        $ret = [];
+        foreach ($data as $i) {
+            $ret[] = (new self())->set($i);
+        }
+        return $ret;
+    }
+
+    /**
      * @param User_model $user
      * @param float $sum
      * @throws Exception
@@ -166,5 +185,70 @@ class Log_model extends CI_Emerald_Model
                 'amount' => $amount,
             ]),
         ]);
+    }
+
+    public static function preparation($data, $preparation = 'default')
+    {
+        switch ($preparation) {
+            case 'wallet_balance_history':
+                return self::_preparation_wallet_balance_history($data);
+            case 'boosterpacks_history':
+                return self::_preparation_boosterpacks_history($data);
+            default:
+                throw new Exception('undefined preparation type');
+        }
+    }
+
+    /**
+     * @param self[] $data
+     * @return stdClass[]
+     * @throws Exception
+     */
+    private static function _preparation_wallet_balance_history($data)
+    {
+        $ret = [];
+
+        foreach ($data as $d) {
+            $o = new stdClass();
+
+            $o->type = $d->get_type();
+
+            if ($o->type === self::TYPE_ADD_MONEY) {
+                $o->sum = $d->get_message()['sum'];
+            } elseif ($o->type === self::TYPE_BUY_BOOSTERPACK) {
+                $o->sum = $d->get_message()['boosterpack']['price'];
+            }
+
+            $o->time_created = $d->get_time_created();
+
+            $ret[] = $o;
+        }
+
+        return $ret;
+    }
+
+    /**
+     * @param self[] $data
+     * @return stdClass[]
+     * @throws Exception
+     */
+    private static function _preparation_boosterpacks_history($data)
+    {
+        $ret = [];
+
+        foreach ($data as $d) {
+            $o = new stdClass();
+
+            $message = $d->get_message();
+
+            $o->amount = $message['amount'];
+            $o->price = $message['boosterpack']['price'];
+
+            $o->time_created = $d->get_time_created();
+
+            $ret[] = $o;
+        }
+
+        return $ret;
     }
 }

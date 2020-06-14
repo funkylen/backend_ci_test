@@ -370,4 +370,28 @@ class Main_page extends MY_Controller
         return $this->response_success(['likes' => $likes]);
     }
 
+    public function get_balance_history()
+    {
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $history = Log_model::preparation(Log_model::get_all(), 'wallet_balance_history');
+
+        return $this->response_success(['history' => $history]);
+    }
+
+    public function get_boosterpacks_history()
+    {
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $history = Log_model::preparation(Log_model::get_all_by_type(
+            Log_model::TYPE_BUY_BOOSTERPACK),
+            'boosterpacks_history'
+        );
+
+        return $this->response_success(['history' => $history]);
+    }
 }
