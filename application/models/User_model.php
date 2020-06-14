@@ -24,6 +24,8 @@ class User_model extends CI_Emerald_Model
     /** @var int */
     protected $rights;
     /** @var float */
+    protected $likes_balance;
+    /** @var float */
     protected $wallet_balance;
     /** @var float */
     protected $wallet_total_refilled;
@@ -149,6 +151,25 @@ class User_model extends CI_Emerald_Model
     {
         $this->wallet_balance = $wallet_balance;
         return $this->save('wallet_balance', $wallet_balance);
+    }
+
+    /**
+     * @return float
+     */
+    public function get_likes_balance(): float
+    {
+        return $this->likes_balance;
+    }
+
+    /**
+     * @param float $likes_balance
+     *
+     * @return bool
+     */
+    public function set_likes_balance(float $likes_balance)
+    {
+        $this->likes_balance = $likes_balance;
+        return $this->save('likes_balance', $likes_balance);
     }
 
     /**

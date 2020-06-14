@@ -175,8 +175,7 @@ class Main_page extends MY_Controller
 
         App::get_ci()->s->start_trans();
 
-        $wallet_withdrawn = $user->get_wallet_total_withdrawn() + 1;
-        $balance = $user->get_wallet_balance() - 1;
+        $balance = $user->get_likes_balance() - 1;
 
         if ($balance < 0) {
             return $this->response_error('insufficient funds');
@@ -201,8 +200,7 @@ class Main_page extends MY_Controller
             $user_like->reload(TRUE);
         }
 
-        $user->set_wallet_balance($balance);
-        $user->set_wallet_total_withdrawn($wallet_withdrawn);
+        $user->set_likes_balance($balance);
 
         $post->reload();
 
@@ -235,8 +233,7 @@ class Main_page extends MY_Controller
 
         App::get_ci()->s->start_trans();
 
-        $wallet_withdrawn = $user->get_wallet_total_withdrawn() + 1;
-        $balance = $user->get_wallet_balance() - 1;
+        $balance = $user->get_likes_balance() - 1;
 
         if ($balance < 0) {
             return $this->response_error('insufficient funds');
@@ -261,8 +258,7 @@ class Main_page extends MY_Controller
             $user_like->reload(TRUE);
         }
 
-        $user->set_wallet_balance($balance);
-        $user->set_wallet_total_withdrawn($wallet_withdrawn);
+        $user->set_likes_balance($balance);
 
         $comment->reload();
 

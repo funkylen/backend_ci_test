@@ -28,5 +28,8 @@ CREATE TABLE `comment_likes` (
   FOREIGN KEY (`user_id`) REFERENCES user(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE `user`
+  ADD `likes_balance` decimal(10,2) NOT NULL DEFAULT '0.00';
+
 
 COMMIT;
