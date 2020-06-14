@@ -41,7 +41,7 @@
                                 <span>{{likes}}</span>
                             </div>
                         </div>
-                        <p class="card-text" v-for="comment in post.coments"> {{comment.user.personaname + ' - '}}<small
+                        <p class="card-text" v-for="comment in post.comments"> {{comment.user.personaname + ' - '}}<small
                                     class="text-muted">{{comment.text}}</small></p>
                         <form class="form-inline">
                             <div class="form-group">
