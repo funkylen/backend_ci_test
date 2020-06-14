@@ -110,10 +110,17 @@ var app = new Vue({
             axios.post('/main_page/buy_boosterpack', {
                 id: id,
             }).then(function (response) {
-                self.amount = response.data.amount
-                if (self.amount !== 0) {
+                if (response.data && response.data.status === 'success') {
+                    self.amount = response.data.amount;
+                    if (self.amount !== 0) {
+                        setTimeout(function () {
+                            $('#amountModalSuccess').modal('show');
+                        }, 500);
+                    }
+                }
+                else if (response.data && response.data.status === 'error') {
                     setTimeout(function () {
-                        $('#amountModal').modal('show');
+                        $('#amountModalError').modal('show');
                     }, 500);
                 }
             });
