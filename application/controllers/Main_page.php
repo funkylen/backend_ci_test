@@ -17,6 +17,7 @@ class Main_page extends MY_Controller
         App::get_ci()->load->model('Login_model');
         App::get_ci()->load->model('Post_model');
         App::get_ci()->load->model('Boosterpack_model');
+        App::get_ci()->load->model('Log_model');
 
         if (is_prod()) {
             die('In production it will be hard to debug! Run as development environment!');
@@ -188,13 +189,15 @@ class Main_page extends MY_Controller
 
         $user = User_model::get_user();
 
-        $balance = $user->get_wallet_balance() + floatval($sum);
-        $total_refilled = $user->get_wallet_total_refilled() + floatval($sum);
+        $sum = floatval($sum);
+
+        $balance = $user->get_wallet_balance() + $sum;
+        $total_refilled = $user->get_wallet_total_refilled() + $sum;
 
         $user->set_wallet_balance($balance);
         $user->set_wallet_total_refilled($total_refilled);
 
-        $user->reload(TRUE);
+        Log_model::add_money($user, $sum);
 
         return $this->response_success(['amount' => $balance]);
     }
@@ -236,6 +239,8 @@ class Main_page extends MY_Controller
         $user->set_wallet_balance($wallet_balance);
         $user->set_likes_balance($likes_balance);
         $user->set_wallet_total_withdrawn($total_withdrawn);
+
+        Log_model::buy_boosterpack($user, $boosterpack, $amount);
 
         App::get_ci()->s->commit();
 

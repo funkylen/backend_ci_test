@@ -300,6 +300,8 @@ class User_model extends CI_Emerald_Model
     public static function preparation($data, $preparation = 'default')
     {
         switch ($preparation) {
+            case 'log':
+                return self::_preparation_log($data);
             case 'main_page':
                 return self::_preparation_main_page($data);
             case 'default':
@@ -307,6 +309,32 @@ class User_model extends CI_Emerald_Model
             default:
                 throw new Exception('undefined preparation type');
         }
+    }
+
+
+    /**
+     * @param User_model $data
+     * @return stdClass
+     */
+    private static function _preparation_log($data)
+    {
+        $o = new stdClass();
+
+        if (!$data->is_loaded()) {
+            $o->id = NULL;
+        } else {
+            $o->id = $data->get_id();
+
+            $o->personaname = $data->get_personaname();
+            $o->wallet_balance = $data->get_wallet_balance();
+            $o->wallet_total_refilled = $data->get_wallet_total_refilled();
+            $o->wallet_total_withdrawn = $data->get_wallet_total_withdrawn();
+
+            $o->time_created = $data->get_time_created();
+            $o->time_updated = $data->get_time_updated();
+        }
+
+        return $o;
     }
 
     /**

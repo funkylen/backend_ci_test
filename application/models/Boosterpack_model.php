@@ -135,4 +135,45 @@ class Boosterpack_model extends CI_Emerald_Model
 
         return $amount;
     }
+
+    /**
+     * @param self|self[] $data
+     * @param string $preparation
+     * @return stdClass|stdClass[]
+     * @throws Exception
+     */
+    public static function preparation($data, $preparation = 'default')
+    {
+        switch ($preparation) {
+            case 'default':
+                return self::_preparation_default($data);
+            default:
+                throw new Exception('undefined preparation type');
+        }
+    }
+
+
+    /**
+     * @param self $data
+     * @return stdClass
+     * @throws Exception
+     */
+    private static function _preparation_default($data)
+    {
+        $o = new stdClass();
+
+        if (!$data->is_loaded()) {
+            $o->id = NULL;
+        } else {
+            $o->id = $data->get_id();
+
+            $o->price = $data->get_price();
+            $o->bank = $data->get_bank();
+
+            $o->time_created = $data->get_time_created();
+            $o->time_updated = $data->get_time_updated();
+        }
+
+        return $o;
+    }
 }
