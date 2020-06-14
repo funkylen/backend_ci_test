@@ -18,7 +18,7 @@
                     <div class="post-img" v-bind:style="{ backgroundImage: 'url(' + post.img + ')' }"></div>
                     <div class="card-body">
                         <div class="likes" @click="addLike(post.id)">
-                            <div class="heart-wrap" v-if="!likes">
+                            <div class="heart-wrap" v-if="!post.liked">
                                 <div class="heart">
                                     <svg class="bi bi-heart" width="1em" height="1em" viewBox="0 0 16 16"
                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -27,7 +27,7 @@
                                               clip-rule="evenodd"/>
                                     </svg>
                                 </div>
-                                <span>{{post.likes}}</span>
+                                <span>{{likes}}</span>
                             </div>
                             <div class="heart-wrap" v-else>
                                 <div class="heart">

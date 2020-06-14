@@ -155,8 +155,63 @@ class Main_page extends MY_Controller
 
     public function like()
     {
-        // todo: add like post\comment logic
-        return $this->response_success(['likes' => rand(1, 55)]); // Колво лайков под постом \ комментарием чтобы обновить
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $assign_id = trim($this->post('assign_id'));
+
+        if (empty($assign_id)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        try {
+            $post = new Post_model($assign_id);
+        } catch (EmeraldModelNoDataException $ex) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NO_DATA);
+        }
+
+        $user = User_model::get_user();
+
+        App::get_ci()->s->start_trans();
+
+        $wallet_withdrawn = $user->get_wallet_total_withdrawn() + 1;
+        $balance = $user->get_wallet_balance() - 1;
+
+        if ($balance < 0) {
+            return $this->response_error('insufficient funds');
+        }
+
+        $user->set_wallet_balance($balance);
+        $user->set_wallet_total_withdrawn($wallet_withdrawn);
+
+        $user_like = App::get_ci()->s
+            ->from('post_likes')
+            ->where('user_id', $user->get_id())
+            ->where('post_id', $post->get_id())
+            ->one();
+
+        if (empty($user_like)) {
+            Post_likes_model::create([
+                'user_id' => $user->get_id(),
+                'post_id' => $post->get_id(),
+                'amount' => 1,
+            ]);
+        } else {
+            $user_like = (new Post_likes_model())->set($user_like);
+            $amount = 1 + $user_like->get_amount();
+            $user_like->set_amount($amount);
+            $user_like->reload(TRUE);
+        }
+
+        $post->reload();
+        $user->reload(TRUE);
+
+        $likes = Post_likes_model::preparation($post->get_likes(), 'full_amount');
+
+        App::get_ci()->s->commit();
+
+        return $this->response_success(['likes' => $likes]);
     }
 
 }

@@ -292,6 +292,18 @@ class Post_model extends CI_Emerald_Model
         $o->comments = Comment_model::preparation($data->get_comments(),'full_info');
         $o->likes = Post_likes_model::preparation($data->get_likes(), 'full_amount');
 
+        if (User_model::is_logged()) {
+            $user_like = App::get_ci()->s
+                ->from(Post_likes_model::CLASS_TABLE)
+                ->where('user_id', User_model::get_user()->get_id())
+                ->where('post_id', $data->get_id())
+                ->one();
+
+            $o->liked = !empty($user_like);
+        } else {
+            $o->liked = FALSE;
+        }
+
 
         $o->time_created = $data->get_time_created();
         $o->time_updated = $data->get_time_updated();

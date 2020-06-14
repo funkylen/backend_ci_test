@@ -86,18 +86,24 @@ var app = new Vue({
             var self = this;
             axios.get('/main_page/get_post/' + id).then(function (response) {
                 self.post = response.data.post;
+                self.likes = response.data.post.likes;
                 if (self.post) {
                     setTimeout(function () {
                         $('#postModal').modal('show');
                     }, 500);
                 }
-            })
+            });
         },
         addLike: function (id) {
             var self = this;
-            axios.get('/main_page/like').then(function (response) {
-                self.likes = response.data.likes;
-            })
+
+            axios.post('/main_page/like', {
+                assign_id: id,
+            }).then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.likes = response.data.likes;
+                }
+            });
         },
         buyPack: function (id) {
             var self = this;
@@ -110,7 +116,7 @@ var app = new Vue({
                         $('#amountModal').modal('show');
                     }, 500);
                 }
-            })
+            });
         },
         comment: function (id) {
             var self = this;
