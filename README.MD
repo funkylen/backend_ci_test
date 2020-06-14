@@ -8,13 +8,21 @@ docker-compose up -d
 `
 
 Миграция:
-1. Зайти в *mysql*
+1. Зайти в *mysql*:
 `
 docker-compose exec db mysql -u root -ppassword
 `
+2. Выбрать (создать, если не существует) БД:
+`
+use backend_ci_test;
+`
 2. Выгрузить дамп:
 `
-use backend_ci_test; source /tmp/dump.sql;
+source /tmp/dumps/dump.sql;
+`
+3. Выгрузить дамп:
+`
+source /tmp/dumps/second_dump.sql;
 `
 
 Приложение будет доступно по адресу:

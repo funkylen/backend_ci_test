@@ -44,7 +44,7 @@ services:
     volumes:
       - dbdata:/var/lib/mysql/
       - ./mysql/my.cnf:/etc/mysql/my.cnf
-      - ./mysql/dump.sql:/tmp/dump.sql
+      - ./mysql/dumps/:/tmp/dumps
     networks:
       - app-network
 
