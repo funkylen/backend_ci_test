@@ -182,11 +182,8 @@ class Main_page extends MY_Controller
             return $this->response_error('insufficient funds');
         }
 
-        $user->set_wallet_balance($balance);
-        $user->set_wallet_total_withdrawn($wallet_withdrawn);
-
         $user_like = App::get_ci()->s
-            ->from('post_likes')
+            ->from(Post_likes_model::CLASS_TABLE)
             ->where('user_id', $user->get_id())
             ->where('post_id', $post->get_id())
             ->one();
@@ -204,10 +201,72 @@ class Main_page extends MY_Controller
             $user_like->reload(TRUE);
         }
 
+        $user->set_wallet_balance($balance);
+        $user->set_wallet_total_withdrawn($wallet_withdrawn);
+
         $post->reload();
-        $user->reload(TRUE);
 
         $likes = Post_likes_model::preparation($post->get_likes(), 'full_amount');
+
+        App::get_ci()->s->commit();
+
+        return $this->response_success(['likes' => $likes]);
+    }
+
+    public function like_comment()
+    {
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $comment_id = trim($this->post('comment_id'));
+
+        if (empty($comment_id)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        try {
+            $comment = new Comment_model($comment_id);
+        } catch (EmeraldModelNoDataException $ex) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NO_DATA);
+        }
+
+        $user = User_model::get_user();
+
+        App::get_ci()->s->start_trans();
+
+        $wallet_withdrawn = $user->get_wallet_total_withdrawn() + 1;
+        $balance = $user->get_wallet_balance() - 1;
+
+        if ($balance < 0) {
+            return $this->response_error('insufficient funds');
+        }
+
+        $user_like = App::get_ci()->s
+            ->from(Comment_likes_model::CLASS_TABLE)
+            ->where('user_id', $user->get_id())
+            ->where('comment_id', $comment->get_id())
+            ->one();
+
+        if (empty($user_like)) {
+            Comment_likes_model::create([
+                'user_id' => $user->get_id(),
+                'comment_id' => $comment->get_id(),
+                'amount' => 1,
+            ]);
+        } else {
+            $user_like = (new Comment_likes_model())->set($user_like);
+            $amount = 1 + $user_like->get_amount();
+            $user_like->set_amount($amount);
+            $user_like->reload(TRUE);
+        }
+
+        $user->set_wallet_balance($balance);
+        $user->set_wallet_total_withdrawn($wallet_withdrawn);
+
+        $comment->reload();
+
+        $likes = Comment_likes_model::preparation($comment->get_likes(), 'full_amount');
 
         App::get_ci()->s->commit();
 

@@ -6,15 +6,15 @@
  * Date: 27.01.2020
  * Time: 10:10
  */
-class Post_likes_model extends CI_Emerald_Model
+class Comment_likes_model extends CI_Emerald_Model
 {
-    const CLASS_TABLE = 'post_likes';
+    const CLASS_TABLE = 'comment_likes';
 
 
     /** @var int */
     protected $user_id;
     /** @var int */
-    protected $post_id;
+    protected $comment_id;
     /** @var int */
     protected $amount;
 
@@ -24,7 +24,7 @@ class Post_likes_model extends CI_Emerald_Model
     protected $time_updated;
 
     // generated
-    protected $post;
+    protected $comment;
     protected $user;
 
 
@@ -50,20 +50,20 @@ class Post_likes_model extends CI_Emerald_Model
     /**
      * @return int
      */
-    public function get_post_id(): int
+    public function get_comment_id(): int
     {
-        return $this->post_id;
+        return $this->comment_id;
     }
 
     /**
-     * @param int $post_id
+     * @param int $comment_id
      *
      * @return bool
      */
-    public function set_post_id(int $post_id)
+    public function set_comment_id(int $comment_id)
     {
-        $this->post_id = $post_id;
-        return $this->save('post_id', $post_id);
+        $this->comment_id = $comment_id;
+        return $this->save('comment_id', $comment_id);
     }
 
     /**
@@ -126,21 +126,21 @@ class Post_likes_model extends CI_Emerald_Model
     // generated
 
     /**
-     * @return Post_model
+     * @return Comment_model
      * @throws Exception
      */
-    public function get_post(): Post_model
+    public function get_comment(): Comment_model
     {
         $this->is_loaded(TRUE);
 
-        if (empty($this->post)) {
+        if (empty($this->comment)) {
             try {
-                $this->post = new Post_model($this->get_post_id());
+                $this->comment = new Comment_model($this->get_comment_id());
             } catch (Exception $exception) {
-                $this->post = new Post_model();
+                $this->comment = new Comment_model();
             }
         }
-        return $this->post;
+        return $this->comment;
     }
 
     /**
@@ -189,14 +189,14 @@ class Post_likes_model extends CI_Emerald_Model
     }
 
     /**
-     * @param int $post_id
+     * @param int $comment_id
      * @return self[]
      */
-    public static function get_all_by_post_id(int $post_id)
+    public static function get_all_by_comment_id(int $comment_id)
     {
         $data = App::get_ci()->s
             ->from(self::CLASS_TABLE)
-            ->where(['post_id' => $post_id])
+            ->where(['comment_id' => $comment_id])
             ->many();
 
         $ret = [];

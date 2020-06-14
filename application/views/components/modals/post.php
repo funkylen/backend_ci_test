@@ -41,13 +41,16 @@
                                 <span>{{likes}}</span>
                             </div>
                         </div>
-                        <p class="card-text" v-for="comment in post.comments"> {{comment.user.personaname + ' - '}}<small
-                                    class="text-muted">{{comment.text}}</small></p>
+
+                        <? App::get_ci()->load->view('components/comments')?>
+
                         <form class="form-inline">
                             <div class="form-group">
                                 <input type="text" class="form-control" id="addComment" v-model="commentText">
                             </div>
-                            <button type="submit" class="btn btn-primary" @click.prevent="comment(post.id)">Оставить комментарий</button>
+                            <button type="submit" class="btn btn-primary" @click.prevent="comment(post.id)">
+                                Оставить комментарий
+                            </button>
                         </form>
                     </div>
                 </div>

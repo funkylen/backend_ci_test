@@ -127,12 +127,18 @@ class Comment_model extends CI_Emerald_Model
     }
 
     // generated
-
     /**
-     * @return mixed
+     * @return Comment_likes_model[]
+     * @throws Exception
      */
     public function get_likes()
     {
+        $this->is_loaded(TRUE);
+
+        if (empty($this->likes)) {
+            $this->likes = Comment_likes_model::get_all_by_comment_id($this->get_id());
+        }
+
         return $this->likes;
     }
 
@@ -166,6 +172,7 @@ class Comment_model extends CI_Emerald_Model
         parent::__construct();
 
         App::get_ci()->load->model('User_model');
+        App::get_ci()->load->model('Comment_likes_model');
 
 
         $this->set_id($id);
@@ -229,6 +236,7 @@ class Comment_model extends CI_Emerald_Model
     /**
      * @param self[] $data
      * @return stdClass[]
+     * @throws Exception
      */
     private static function _preparation_full_info($data)
     {
@@ -242,7 +250,19 @@ class Comment_model extends CI_Emerald_Model
 
             $o->user = User_model::preparation($d->get_user(),'main_page');
 
-            $o->likes = rand(0, 25);
+            $o->likes = Comment_likes_model::preparation($d->get_likes(), 'full_amount');
+
+            if (User_model::is_logged()) {
+                $user_like = App::get_ci()->s
+                    ->from(Comment_likes_model::CLASS_TABLE)
+                    ->where('user_id', User_model::get_user()->get_id())
+                    ->where('comment_id', $d->get_id())
+                    ->one();
+
+                $o->liked = !empty($user_like);
+            } else {
+                $o->liked = FALSE;
+            }
 
             $o->time_created = $d->get_time_created();
             $o->time_updated = $d->get_time_updated();
