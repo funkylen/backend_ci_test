@@ -16,6 +16,7 @@ class Main_page extends MY_Controller
         App::get_ci()->load->model('User_model');
         App::get_ci()->load->model('Login_model');
         App::get_ci()->load->model('Post_model');
+        App::get_ci()->load->model('Boosterpack_model');
 
         if (is_prod()) {
             die('In production it will be hard to debug! Run as development environment!');
@@ -148,8 +149,45 @@ class Main_page extends MY_Controller
 
     public function buy_boosterpack()
     {
-        // todo: add money to user logic
-        return $this->response_success(['amount' => rand(1, 55)]);
+        if (!User_model::is_logged()) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NEED_AUTH);
+        }
+
+        $id = trim($this->post('id'));
+
+        if (empty($id)) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_WRONG_PARAMS);
+        }
+
+        try {
+            $boosterpack = new Boosterpack_model($id);
+        } catch (EmeraldModelNoDataException $ex) {
+            return $this->response_error(CI_Core::RESPONSE_GENERIC_NO_DATA);
+        }
+
+        $user = User_model::get_user();
+
+        App::get_ci()->s->start_trans();
+
+        $wallet_balance = $user->get_wallet_balance() - $boosterpack->get_price();
+
+        if ($wallet_balance < 0) {
+            return $this->response_error('insufficient funds');
+        }
+
+        $amount = $boosterpack->execute();
+
+        $likes_balance = $user->get_likes_balance() + $amount;
+
+        $total_withdrawn = $user->get_wallet_total_withdrawn() + $boosterpack->get_price();
+
+        $user->set_wallet_balance($wallet_balance);
+        $user->set_likes_balance($likes_balance);
+        $user->set_wallet_total_withdrawn($total_withdrawn);
+
+        App::get_ci()->s->commit();
+
+        return $this->response_success(['amount' => $amount]);
     }
 
 

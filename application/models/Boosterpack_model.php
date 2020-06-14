@@ -124,4 +124,15 @@ class Boosterpack_model extends CI_Emerald_Model
         return (App::get_ci()->s->get_affected_rows() > 0);
     }
 
+    public function execute()
+    {
+        $amount = rand(1, $this->get_price() + $this->get_bank());
+
+        $new_bank = $this->get_bank() + ($this->get_price() - $amount);
+
+        // @QUESTION: can it be less than 0?
+        $this->set_bank($new_bank < 0 ? 0 : $new_bank);
+
+        return $amount;
+    }
 }
