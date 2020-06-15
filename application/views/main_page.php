@@ -10,6 +10,7 @@
 <? App::get_ci()->load->view('components/modals/boosterpack_success'); ?>
 <? App::get_ci()->load->view('components/modals/boosterpack_error'); ?>
 <? App::get_ci()->load->view('components/modals/balance_history'); ?>
+<? App::get_ci()->load->view('components/modals/boosterpacks_history'); ?>
 
 <? App::get_ci()->load->view('base/footer'); ?>
 

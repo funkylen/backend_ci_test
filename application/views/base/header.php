@@ -34,7 +34,7 @@
                     </li>
                     <li class="nav-item text-white">
                         <button type="button" class="btn btn-secondary my-2 my-sm-0" type="submit" data-toggle="modal"
-                                data-target="#packsHistoryModal">История бустерпаков
+                                data-target="#packsHistoryModal" @click="loadPacksHistory">История бустерпаков
                         </button>
                     </li>
                     <li class="nav-item">

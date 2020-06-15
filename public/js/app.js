@@ -242,7 +242,16 @@ var app = new Vue({
                     });
                 }
             });
-        }
+        },
+        loadPacksHistory: function () {
+            var self = this;
+
+            axios.get('/main_page/get_boosterpacks_history').then(function (response) {
+                if (response.data && response.data.status === 'success') {
+                    self.history = response.data.history;
+                }
+            });
+        },
     }
 });
 

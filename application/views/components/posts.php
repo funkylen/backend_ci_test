@@ -1,5 +1,5 @@
 <div class="posts">
-    <h1 class="text-center">Posts</h1>
+    <h1 class="text-center">Посты</h1>
     <div class="container">
         <div class="row">
             <div class="col-4" v-for="post in posts" v-if="posts">
@@ -10,7 +10,7 @@
                         <h5 class="card-title">Post - {{post.id}}</h5>
                         <p class="card-text">{{post.text}}</p>
                         <button type="button" class="btn btn-outline-success my-2 my-sm-0" @click="openPost(post.id)">
-                            Open post
+                            Открыть пост
                         </button>
                     </div>
                 </div>
@@ -19,5 +19,4 @@
     </div>
 
     <? App::get_ci()->load->view('components/boosterpacks'); ?>
-    <? App::get_ci()->load->view('components/help'); ?>
 </div>

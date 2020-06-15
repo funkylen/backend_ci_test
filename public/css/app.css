@@ -62,3 +62,7 @@
     text-decoration: underline;
 }
 
+.heart:hover {
+    cursor: pointer;
+}
+
